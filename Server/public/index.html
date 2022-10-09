@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ESP8266 WebSocket</title>
+		<link
+			rel="stylesheet"
+			href="index.css"
+		/>
+	</head>
+	<body>
+		<div class="container">
+			<h2 class="heading">
+				Webscoket status:
+				<span
+					id="status"
+					style="font-weight: bold"
+				>
+					disconnected
+				</span>
+			</h2>
+			<div class="raochan">
+				Điều khiển rào chắn
+				<input
+					type="checkbox"
+					id="switch"
+				/><label for="switch">Toggle</label>
+			</div>
+		</div>
+		<script type="text/javascript">
+			var button = document.getElementById("btn");
+			var led = document.getElementById("switch");
+			var url = window.location.host; // hàm trả về url của trang hiện tại kèm theo port
+			var ws = new WebSocket("ws://" + url + "/ws"); // mở 1 websocket với port 8000
+			console.log("connecting...");
+			ws.onopen =
+				function () //khi websocket được mở thì hàm này sẽ được thưc hiện
+				{
+					document.getElementById("status").innerHTML = "Connected";
+					led.disabled = false; //khi websocket được mở, mới cho phép
+					console.log("connected...");
+				};
+			ws.onmessage = function (
+				evt // sự kiện xảy ra khi client nhận dữ liệu từ server
+			) {
+				console.log(evt.data);
+			};
+			ws.onclose = function () {
+				// hàm này sẽ được thực hiện khi đóng websocket
+				led.disabled = true;
+				document.getElementById("status").innerHTML = "Connected";
+			};
+			led.onchange = function () {
+				// thực hiện thay đổi bật/tắt led
+				var led_status = "BR_OFF";
+				if (led.checked) {
+					led_status = "BR_ON";
+				}
+				ws.send(led_status);
+			};
+		</script>
+	</body>
+</html>
